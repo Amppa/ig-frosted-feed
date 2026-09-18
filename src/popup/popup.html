@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Frosted Feed</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="card">
+    <header class="header">
+      <div class="brand">
+        <div class="logo-badge">FF</div>
+        <div>
+          <h1 class="title">Frosted Feed</h1>
+          <p class="subtitle">Instagram Overlay Mask</p>
+        </div>
+      </div>
+      <label class="switch main-toggle" title="Master Toggle">
+        <input type="checkbox" id="enabled">
+        <span class="slider round"></span>
+      </label>
+    </header>
+
+    <!-- Stat Counter Card -->
+    <div class="stat-card">
+      <div class="stat-info">
+        <span class="stat-number" id="blockedCount">0</span>
+        <span class="stat-title">Feed Items Masked</span>
+      </div>
+      <button class="reset-btn" id="resetBtn" title="Reset counter">Reset</button>
+    </div>
+
+    <footer class="footer">
+      <button class="settings-btn" id="openOptionsBtn" title="Open Settings">
+        <span class="settings-icon">⚙️</span> Settings
+      </button>
+    </footer>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>

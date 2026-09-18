@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Frosted Feed - Settings</title>
+  <link rel="stylesheet" href="options.css">
+</head>
+
+<body>
+  <div class="container">
+    <header class="header">
+      <div class="brand">
+        <div class="logo-badge">FF</div>
+        <div>
+          <h1 class="title">Frosted Feed Settings</h1>
+          <p class="subtitle">Customize overlay appearance, blur, and pixel-precise alignment</p>
+        </div>
+      </div>
+      <button class="reset-btn" id="resetDefaultsBtn">Reset to Defaults</button>
+    </header>
+
+    <div class="main-layout">
+      <!-- Settings Section -->
+      <section class="settings-card">
+        <h2 class="section-title">Mask Coverage</h2>
+
+        <div class="radio-card-group">
+          <label class="radio-card">
+            <input type="radio" name="maskCoverage" value="mediaOnly" id="covMediaOnly">
+            <div class="radio-card-content">
+              <div class="radio-card-header">
+                <span class="radio-indicator"></span>
+                <span class="radio-card-title">Mask Media Only</span>
+              </div>
+              <span class="radio-card-desc">Overlay photo & video only, keeping the author header and action buttons
+                accessible</span>
+            </div>
+          </label>
+
+          <label class="radio-card">
+            <input type="radio" name="maskCoverage" value="entireCard" id="covEntireCard">
+            <div class="radio-card-content">
+              <div class="radio-card-header">
+                <span class="radio-indicator"></span>
+                <span class="radio-card-title">Mask Entire Card</span>
+              </div>
+              <span class="radio-card-desc">Overlay the full recommended post card completely</span>
+            </div>
+          </label>
+        </div>
+
+        <div class="divider"></div>
+
+        <h2 class="section-title">Overlay Appearance</h2>
+
+        <!-- Mask Color -->
+        <div class="control-group">
+          <div class="control-label-wrap">
+            <span class="control-label">Mask Color</span>
+            <span class="control-desc">Base background tone for the overlay</span>
+          </div>
+          <div class="color-picker-wrap">
+            <input type="color" id="maskColor" value="#000000">
+            <span class="color-code" id="maskColorCode">#000000</span>
+          </div>
+        </div>
+
+        <!-- Mask Opacity (min 0%) -->
+        <div class="control-group">
+          <div class="control-label-wrap">
+            <span class="control-label">Mask Opacity</span>
+            <span class="control-desc">Darkness level (0% completely transparent to 100% solid)</span>
+          </div>
+          <div class="slider-wrap">
+            <input type="range" id="maskOpacity" min="0" max="100" value="78">
+            <span class="slider-val" id="maskOpacityVal">78%</span>
+          </div>
+        </div>
+
+        <!-- Backdrop Blur -->
+        <div class="control-group">
+          <div class="control-label-wrap">
+            <span class="control-label">Backdrop Blur</span>
+            <span class="control-desc">Soft frosted glass effect behind the overlay</span>
+          </div>
+          <div class="slider-wrap">
+            <input type="range" id="maskBlur" min="0" max="20" value="4">
+            <span class="slider-val" id="maskBlurVal">4px</span>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <h2 class="section-title">Alignment</h2>
+
+        <!-- Vertical Shift (Shift Y) -->
+        <div class="control-group">
+          <div class="control-label-wrap">
+            <span class="control-label">Vertical Offset</span>
+            <span class="control-desc">Fine-tune mask position up or down to align with post edges</span>
+          </div>
+          <div class="slider-wrap">
+            <input type="range" id="maskShiftY" min="-30" max="30" value="0">
+            <span class="slider-val" id="maskShiftYVal">0px</span>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <h2 class="section-title">Developer & Diagnostics</h2>
+
+        <!-- Debug Log -->
+        <div class="control-group switch-row">
+          <div class="control-label-wrap">
+            <span class="control-label">F12 Console Log</span>
+            <span class="control-desc">Print detailed filter inspection logs in Developer Tools</span>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="debugLog">
+            <span class="slider round"></span>
+          </label>
+        </div>
+
+        <div class="divider"></div>
+        <p class="settings-hint">Settings are saved automatically and applied to Instagram in real-time.</p>
+      </section>
+    </div>
+  </div>
+  <script src="options.js"></script>
+</body>
+
+</html>

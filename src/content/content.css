@@ -1,0 +1,76 @@
+﻿/* src/content/content.css */
+/* Frosted Feed - Zero-Shift Overlay Mask & Interaction Styles */
+
+:root {
+  --frosted-mask-bg: rgba(0, 0, 0, 0.78);
+  --frosted-mask-blur: 4px;
+  --frosted-mask-shift-y: 0px;
+}
+
+/* Ensure container relativity for zero-shift overlay positioning */
+article[data-frosted-feed-masked=true] {
+  position: relative !important;
+}
+
+/* Absolute Floating Overlay Mask */
+.frosted-feed-overlay {
+  position: absolute !important;
+  box-sizing: border-box !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  transform: translateY(var(--frosted-mask-shift-y, 0px)) !important;
+  z-index: 10 !important;
+  background: var(--frosted-mask-bg, rgba(0, 0, 0, 0.78)) !important;
+  backdrop-filter: blur(var(--frosted-mask-blur, 4px)) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  cursor: pointer !important;
+  transition: opacity 0.25s ease, background-color 0.25s ease !important;
+  user-select: none !important;
+  overflow: hidden !important;
+}
+
+/* Click-to-Reveal: transparent overlay allowing full native post clicks */
+.frosted-feed-overlay.is-revealed {
+  background: transparent !important;
+  backdrop-filter: none !important;
+  border-color: transparent !important;
+  pointer-events: none !important;
+}
+
+/* Floating Action Badge (Top-Left Pill) */
+.frosted-feed-badge {
+  position: absolute !important;
+  top: 12px !important;
+  left: 12px !important;
+  background: rgba(20, 20, 24, 0.88) !important;
+  border: 1px solid rgba(255, 255, 255, 0.22) !important;
+  color: #ffffff !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  padding: 5px 12px !important;
+  border-radius: 14px !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5) !important;
+  pointer-events: auto !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  white-space: nowrap !important;
+  line-height: 1.4 !important;
+  user-select: none !important;
+}
+
+.frosted-feed-badge:hover {
+  background: rgba(35, 35, 42, 0.95) !important;
+  border-color: rgba(255, 255, 255, 0.35) !important;
+  transform: scale(1.03);
+}
+
+.frosted-feed-overlay.is-revealed .frosted-feed-badge {
+  opacity: 0.85 !important;
+  background: rgba(15, 15, 18, 0.9) !important;
+  border-color: rgba(255, 255, 255, 0.25) !important;
+}
+
+.frosted-feed-overlay.is-revealed .frosted-feed-badge:hover {
+  opacity: 1 !important;
+}
