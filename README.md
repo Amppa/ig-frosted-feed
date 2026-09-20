@@ -45,7 +45,7 @@ A lightweight, high-performance Chrome Extension (Manifest V3) designed to elimi
 frosted-feed/
 ├── manifest.json            # Manifest V3 configuration
 ├── README.md                # Project documentation
-├── develop.md               # Architecture and technical design notes
+├── AGENTS.md                # Architecture notes & contributor/AI agent guide
 ├── icons/                   # Extension icons (16, 32, 48, 128)
 └── src/
     ├── content/
