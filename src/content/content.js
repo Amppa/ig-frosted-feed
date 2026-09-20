@@ -165,8 +165,12 @@
     const picRect = pic.getBoundingClientRect();
 
     if (picRect.width > 0 && picRect.height > 0) {
-      const topOffset = Math.max(0, picRect.top - postRect.top);
-      const leftOffset = Math.max(0, picRect.left - postRect.left);
+      // Compensate for the article's border-width: getBoundingClientRect() returns the
+      // border box, but absolutely-positioned children are placed relative to the
+      // padding box (clientLeft/clientTop). Without this, overlays drift right/down
+      // by the article's border width (varies per post, e.g. /p/ permalink pages).
+      const topOffset = Math.max(0, picRect.top - postRect.top - post.clientTop);
+      const leftOffset = Math.max(0, picRect.left - postRect.left - post.clientLeft);
 
       overlay.style.top = `${topOffset}px`;
       overlay.style.left = `${leftOffset}px`;
@@ -204,6 +208,11 @@
 
     const header = post.querySelector('header');
     if (header) picObserver.observe(header);
+
+    // Also observe the article itself: on /p/ permalink pages Instagram loads the
+    // comments sidebar asynchronously, which shifts/resizes the article without
+    // necessarily resizing the media element — ResizeObserver on pic alone misses it.
+    picObserver.observe(post);
 
     let overlay = post.querySelector('.frosted-feed-overlay');
     if (!overlay) {
@@ -244,6 +253,17 @@
 
       post.appendChild(overlay);
       incrementBlockedCount(1);
+
+      // Re-align after Instagram's async layout settles (sidebar render, centering,
+      // font/media swaps). These shifts often don't resize the media element, so
+      // observers alone miss them — this guarantees eventual correct alignment.
+      [120, 450, 1200].forEach((ms) => {
+        setTimeout(() => {
+          if (post.dataset.frostedFeedMasked === 'true' && post.isConnected) {
+            alignOverlay(overlay, post, findPostPic(post));
+          }
+        }, ms);
+      });
     }
 
     alignOverlay(overlay, post, pic);
