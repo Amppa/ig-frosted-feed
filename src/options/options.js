@@ -1,12 +1,7 @@
 // src/options/options.js
 document.addEventListener('DOMContentLoaded', () => {
-  const DEFAULT_SETTINGS = {
-    maskCoverage: 'mediaOnly', // 'mediaOnly' | 'entireCard'
-    maskColor: '#000000',
-    maskOpacity: 78,
-    maskBlur: 4,
-    debugLog: false,
-  };
+  // Defaults come from src/shared/defaults.js (loaded via options.html script tag).
+  const DEFAULT_SETTINGS = { ...FROSTED_FEED_DEFAULTS };
 
   // UI Elements
   const covMediaOnlyRadio = document.getElementById('covMediaOnly');

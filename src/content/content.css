@@ -1,8 +1,10 @@
 ﻿/* src/content/content.css */
 /* Frosted Feed - Zero-Shift Overlay Mask & Interaction Styles */
 
+/* Keep --frosted-mask-bg in sync with maskOpacity in src/shared/defaults.js —
+   Chrome injects this CSS at document_start, before any JS can run. */
 :root {
-  --frosted-mask-bg: rgba(0, 0, 0, 0.78);
+  --frosted-mask-bg: rgba(0, 0, 0, 0.8); /* mirror of maskOpacity: 80 */
   --frosted-mask-blur: 4px;
 }
 
@@ -18,7 +20,7 @@ article[data-frosted-feed-masked=true] {
   margin: 0 !important;
   padding: 0 !important;
   z-index: 10 !important;
-  background: var(--frosted-mask-bg, rgba(0, 0, 0, 0.78)) !important;
+  background: var(--frosted-mask-bg, rgba(0, 0, 0, 0.8)) !important;
   backdrop-filter: blur(var(--frosted-mask-blur, 4px)) !important;
   border: 1px solid rgba(255, 255, 255, 0.2) !important;
   cursor: pointer !important;

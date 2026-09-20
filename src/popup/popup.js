@@ -13,13 +13,15 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Load stored settings and count
-  chrome.storage.local.get({ enabled: true, blockedCount: 0 }, (settings) => {
-    if (enabledToggle) {
-      enabledToggle.checked = settings.enabled;
+  chrome.storage.local.get(
+    { enabled: FROSTED_FEED_DEFAULTS.enabled, blockedCount: FROSTED_FEED_DEFAULTS.blockedCount },
+    (settings) => {
+      if (enabledToggle) {
+        enabledToggle.checked = settings.enabled;
+      }
+      updateCounter(settings.blockedCount);
     }
-    updateCounter(settings.blockedCount);
-  });
-
+  );
   // Listen for storage changes in real-time
   chrome.storage.onChanged.addListener((changes, areaName) => {
     if (areaName === 'local') {

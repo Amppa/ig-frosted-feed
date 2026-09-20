@@ -4,16 +4,19 @@
   'use strict';
 
   // --- 1. Configuration & State Management ---
-  const DEFAULT_CONFIG = {
+  // Defaults come from src/shared/defaults.js (loaded before this script).
+  // Fallback to inline defaults if the shared script hasn't executed yet
+  // (defensive: document_start timing, stale tabs after extension reload).
+  const DEFAULT_CONFIG = { ...(globalThis.FROSTED_FEED_DEFAULTS || {
     enabled: true,
     maskSuggested: true,
-    maskCoverage: 'mediaOnly', // 'mediaOnly' | 'entireCard'
+    maskCoverage: 'mediaOnly',
     maskColor: '#000000',
-    maskOpacity: 78,
+    maskOpacity: 80,
     maskBlur: 4,
     debugLog: false,
     blockedCount: 0,
-  };
+  }) };
 
   let currentConfig = { ...DEFAULT_CONFIG };
 
@@ -33,7 +36,7 @@
     const r = (num >> 16) & 255;
     const g = (num >> 8) & 255;
     const b = num & 255;
-    const a = ((opacityPercent ?? 78) / 100).toFixed(2);
+    const a = ((opacityPercent ?? (globalThis.FROSTED_FEED_DEFAULTS?.maskOpacity ?? 80)) / 100).toFixed(2);
     return `rgba(${r}, ${g}, ${b}, ${a})`;
   }
 

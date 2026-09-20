@@ -71,11 +71,11 @@
         <div class="control-group">
           <div class="control-label-wrap">
             <span class="control-label">Mask Opacity</span>
-            <span class="control-desc">Darkness level (0% completely transparent to 100% solid)</span>
+            <span class="control-desc">Darkness level (0%: transparent, 100%: solid)</span>
           </div>
           <div class="slider-wrap">
-            <input type="range" id="maskOpacity" min="0" max="100" value="78">
-            <span class="slider-val" id="maskOpacityVal">78%</span>
+            <input type="range" id="maskOpacity" min="0" max="100" step="5" value="80">
+            <span class="slider-val" id="maskOpacityVal">80%</span>
           </div>
         </div>
 
@@ -112,6 +112,7 @@
       </section>
     </div>
   </div>
+  <script src="../shared/defaults.js"></script>
   <script src="options.js"></script>
 </body>
 
