@@ -4,19 +4,9 @@
   'use strict';
 
   // --- 1. Configuration & State Management ---
-  // Defaults come from src/shared/defaults.js (loaded before this script).
-  // Fallback to inline defaults if the shared script hasn't executed yet
-  // (defensive: document_start timing, stale tabs after extension reload).
-  const DEFAULT_CONFIG = { ...(globalThis.FROSTED_FEED_DEFAULTS || {
-    enabled: true,
-    maskSuggested: true,
-    maskCoverage: 'mediaOnly',
-    maskColor: '#000000',
-    maskOpacity: 80,
-    maskBlur: 4,
-    debugLog: false,
-    blockedCount: 0,
-  }) };
+  // Defaults come from src/shared/defaults.js — Chrome guarantees content_scripts
+  // execute in manifest order, so this is always defined by the time we run.
+  const DEFAULT_CONFIG = { ...globalThis.FROSTED_FEED_DEFAULTS };
 
   let currentConfig = { ...DEFAULT_CONFIG };
 
@@ -28,7 +18,7 @@
 
   // Convert hex color and opacity percentage to RGBA string
   function hexToRgba(hex, opacityPercent) {
-    let c = (hex || '#000000').replace('#', '');
+    let c = (hex || DEFAULT_CONFIG.maskColor).replace('#', '');
     if (c.length === 3) {
       c = c.split('').map((x) => x + x).join('');
     }
@@ -36,7 +26,7 @@
     const r = (num >> 16) & 255;
     const g = (num >> 8) & 255;
     const b = num & 255;
-    const a = ((opacityPercent ?? (globalThis.FROSTED_FEED_DEFAULTS?.maskOpacity ?? 80)) / 100).toFixed(2);
+    const a = ((opacityPercent ?? DEFAULT_CONFIG.maskOpacity) / 100).toFixed(2);
     return `rgba(${r}, ${g}, ${b}, ${a})`;
   }
 
@@ -46,7 +36,7 @@
     if (!root) return;
     const rgba = hexToRgba(config.maskColor, config.maskOpacity);
     root.style.setProperty('--frosted-mask-bg', rgba);
-    root.style.setProperty('--frosted-mask-blur', `${config.maskBlur ?? 4}px`);
+    root.style.setProperty('--frosted-mask-blur', `${config.maskBlur ?? DEFAULT_CONFIG.maskBlur}px`);
   }
 
   // --- 2. Batched Counter Storage ---
@@ -138,30 +128,7 @@
 
   // Align the overlay precisely to the pic boundary or the entire card
   function alignOverlay(overlay, post, pic) {
-    if (!overlay || !post) return;
-
-    if (currentConfig.maskCoverage === 'entireCard' || !pic) {
-      // Entire Card: compensate for margin collapse / header offset
-      const postRect = post.getBoundingClientRect();
-      const header = post.querySelector('header') || post.firstElementChild;
-      let topOffset = 0;
-      let totalHeight = postRect.height;
-
-      if (header) {
-        const headerRect = header.getBoundingClientRect();
-        if (headerRect.height > 0) {
-          topOffset = headerRect.top - postRect.top;
-          totalHeight = Math.max(postRect.height, postRect.bottom - headerRect.top);
-        }
-      }
-
-      overlay.style.top = `${topOffset}px`;
-      overlay.style.left = '0px';
-      overlay.style.width = '100%';
-      overlay.style.height = `${totalHeight}px`;
-      overlay.style.borderRadius = '8px';
-      return;
-    }
+    if (!overlay || !post || !pic) return;
 
     // Media Only: detect pic bounds relative to post
     const postRect = post.getBoundingClientRect();
@@ -270,7 +237,7 @@
     }
 
     alignOverlay(overlay, post, pic);
-    log(`🛡️ Masked [${currentConfig.maskCoverage}]: ${reason}`, { post, pic });
+    log(`🛡️ Masked: ${reason}`, { post, pic });
   }
 
   // Remove mask from post
@@ -282,8 +249,15 @@
   }
 
   // --- 5. DOM Filter Pipeline & Observer ---
+
+  // Only mask on the home feed. Instagram is an SPA, so route changes do not
+  // reload the page — we must detect navigation and strip/apply masks accordingly.
+  function isHomeFeed() {
+    return location.pathname === '/' || location.pathname === '';
+  }
+
   function filterDOM(root = document) {
-    const isMaskActive = currentConfig.enabled && currentConfig.maskSuggested;
+    const isMaskActive = currentConfig.enabled && currentConfig.maskSuggested && isHomeFeed();
 
     const articles = root.querySelectorAll ? root.querySelectorAll('article') : [];
     articles.forEach((post) => {
@@ -329,7 +303,6 @@
       const functionalKeys = [
         'enabled',
         'maskSuggested',
-        'maskCoverage',
         'maskColor',
         'maskOpacity',
         'maskBlur',
@@ -389,6 +362,18 @@
       }
     });
   });
+
+  // SPA route-change detection: Instagram navigates without reloading, so poll the
+  // URL and re-run the filter when leaving/entering the home feed. This strips
+  // masks on non-home pages and re-applies them when returning home.
+  let lastPathname = location.pathname;
+  setInterval(() => {
+    if (location.pathname !== lastPathname) {
+      lastPathname = location.pathname;
+      log(`🔀 Route changed to ${lastPathname} — re-evaluating masks`);
+      filterDOM();
+    }
+  }, 500);
 
   // Initial startup
   chrome.storage.local.get(DEFAULT_CONFIG, (stored) => {

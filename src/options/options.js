@@ -4,8 +4,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const DEFAULT_SETTINGS = { ...FROSTED_FEED_DEFAULTS };
 
   // UI Elements
-  const covMediaOnlyRadio = document.getElementById('covMediaOnly');
-  const covEntireCardRadio = document.getElementById('covEntireCard');
   const maskColorInput = document.getElementById('maskColor');
   const maskColorCode = document.getElementById('maskColorCode');
   const maskOpacityInput = document.getElementById('maskOpacity');
@@ -17,12 +15,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Update UI values
   function applyToUI(settings) {
-    if (settings.maskCoverage === 'entireCard') {
-      covEntireCardRadio.checked = true;
-    } else {
-      covMediaOnlyRadio.checked = true;
-    }
-
     maskColorInput.value = settings.maskColor;
     maskColorCode.textContent = settings.maskColor.toUpperCase();
 
@@ -44,15 +36,6 @@ document.addEventListener('DOMContentLoaded', () => {
   function saveChange(key, value) {
     chrome.storage.local.set({ [key]: value });
   }
-
-  // Coverage mode radios
-  document.querySelectorAll('input[name="maskCoverage"]').forEach((radio) => {
-    radio.addEventListener('change', (e) => {
-      if (e.target.checked) {
-        saveChange('maskCoverage', e.target.value);
-      }
-    });
-  });
 
   // Event Listeners for Live adjustments
   maskColorInput.addEventListener('input', (e) => {

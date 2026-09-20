@@ -10,10 +10,13 @@
 globalThis.FROSTED_FEED_DEFAULTS = {
   enabled: true,
   maskSuggested: true,
-  maskCoverage: 'mediaOnly', // 'mediaOnly' | 'entireCard'
   maskColor: '#000000',
-  maskOpacity: 80, // 0 = fully transparent, 100 = solid
-  maskBlur: 4, // px, backdrop-filter blur radius
+  maskOpacity: 50, // 0 = fully transparent, 100 = solid
+  maskBlur: 5, // px, backdrop-filter blur radius
   debugLog: false,
   blockedCount: 0,
 };
+
+// Derived values shared by all scripts (avoid duplicating math).
+globalThis.FROSTED_FEED_DEFAULTS.rgbaOpacity = globalThis.FROSTED_FEED_DEFAULTS.maskOpacity / 100;
+

@@ -8,9 +8,11 @@ A lightweight, high-performance Chrome Extension (Manifest V3) designed to elimi
 
 - **Zero Layout Shift (Zero Stutter)**:
   - Avoids removing DOM nodes dynamically, completely preventing scrollbar bouncing and skeleton placeholder flashes.
-- **Two Flexible Mask Coverage Modes**:
-  - **Mask Media Only** (Default): Accurately detects the bounding box of photos and videos. Keeps the author header and bottom interactive buttons (like/comment/share) accessible, so you can interact with creators without distraction from media content.
-  - **Mask Entire Card**: Automatically compensates for Instagram's top margin collapse and covers the entire recommendation post card seamlessly.
+- **Home Feed Only Masking**:
+  - Masks are applied exclusively to the Instagram home feed (`instagram.com/`). Other pages (Explore, Reels, profiles, single posts) are never masked — this avoids false positives on pages where all content is intentionally discoverable.
+  - Single Page App (SPA) navigation is detected automatically: masks are stripped when you leave the home feed and re-applied when you return, with no page reload required.
+- **Precision Media-Only Mask**:
+  - Accurately detects the bounding box of photos and videos. Keeps the author header and bottom interactive buttons (like/comment/share) accessible, so you can interact with creators without distraction from media content.
 - **Full Click Pass-Through & Reveal**:
   - Click on the overlay to toggle Show Media.
   - Once revealed, the overlay becomes fully click-transparent (pointer-events: none), completely restoring all native Instagram interactions (double-tap like, open post, swipe carousel, play/pause video).
@@ -22,6 +24,7 @@ A lightweight, high-performance Chrome Extension (Manifest V3) designed to elimi
 - **Minimalist Popup Interface**:
   - One-click master toggle switch.
   - Live masked items counter with a reset button.
+  - **Your Following Only** button: one click opens Instagram's official Following feed (`?variant=following`), hiding algorithmic suggestions.
   - Quick-access button to the Settings page.
 
 ---
