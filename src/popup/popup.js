@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const blockedCountEl = document.getElementById('blockedCount');
   const resetBtn = document.getElementById('resetBtn');
   const openOptionsBtn = document.getElementById('openOptionsBtn');
+  const openFollowingBtn = document.getElementById('openFollowingBtn');
 
   function updateCounter(count) {
     if (blockedCountEl) {
@@ -51,6 +52,13 @@ document.addEventListener('DOMContentLoaded', () => {
   if (openOptionsBtn) {
     openOptionsBtn.addEventListener('click', () => {
       chrome.runtime.openOptionsPage();
+    });
+  }
+
+  // Open Instagram's "Following" feed in a new tab
+  if (openFollowingBtn) {
+    openFollowingBtn.addEventListener('click', () => {
+      chrome.tabs.create({ url: 'https://www.instagram.com/?variant=following' });
     });
   }
 });

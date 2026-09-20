@@ -190,6 +190,9 @@ input:checked + .slider:before {
 /* Footer & Standard Settings Button */
 .footer {
   margin-top: 2px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .settings-btn {
@@ -221,4 +224,24 @@ input:checked + .slider:before {
 
 .settings-icon {
   font-size: 15px;
+}
+
+/* Two-line button text (title + subtitle) */
+.btn-text {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  line-height: 1.2;
+}
+
+.btn-title {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.btn-subtitle {
+  font-size: 10.5px;
+  font-weight: 400;
+  color: var(--text-secondary);
 }
