@@ -10,6 +10,12 @@
 
   let currentConfig = { ...DEFAULT_CONFIG };
 
+  // Guard: after extension reload/update, the old content script becomes orphaned
+  // and chrome.storage / chrome.runtime become undefined. Bail out silently.
+  function isExtContextValid() {
+    return typeof chrome !== 'undefined' && !!chrome.storage && !!chrome.runtime?.id;
+  }
+
   const log = (...args) => {
     if (currentConfig.debugLog) {
       console.log('%c[Frosted Feed]', 'background: #18181c; color: #e1306c; border-radius: 3px; padding: 2px 6px; font-weight: bold;', ...args);
@@ -44,7 +50,7 @@
   let saveTimer = null;
 
   function commitBlockedCount() {
-    if (pendingCount === 0) return;
+    if (pendingCount === 0 || !isExtContextValid()) return;
     const toAdd = pendingCount;
     pendingCount = 0;
 
@@ -298,27 +304,29 @@
   }
 
   // Storage change listener
-  chrome.storage.onChanged.addListener((changes, areaName) => {
-    if (areaName === 'local') {
-      const functionalKeys = [
-        'enabled',
-        'maskSuggested',
-        'maskColor',
-        'maskOpacity',
-        'maskBlur',
-        'debugLog',
-      ];
-      const hasFunctionalChange = functionalKeys.some((k) => k in changes);
+  if (isExtContextValid()) {
+    chrome.storage.onChanged.addListener((changes, areaName) => {
+      if (areaName === 'local') {
+        const functionalKeys = [
+          'enabled',
+          'maskSuggested',
+          'maskColor',
+          'maskOpacity',
+          'maskBlur',
+          'debugLog',
+        ];
+        const hasFunctionalChange = functionalKeys.some((k) => k in changes);
 
-      if (hasFunctionalChange) {
-        chrome.storage.local.get(DEFAULT_CONFIG, (updated) => {
-          currentConfig = { ...updated };
-          applyDynamicCssVars(updated);
-          filterDOM();
-        });
+        if (hasFunctionalChange) {
+          chrome.storage.local.get(DEFAULT_CONFIG, (updated) => {
+            currentConfig = { ...updated };
+            applyDynamicCssVars(updated);
+            filterDOM();
+          });
+        }
       }
-    }
-  });
+    });
+  }
 
   // MutationObserver for infinite scroll
   let debounceTimer = null;
@@ -376,11 +384,13 @@
   }, 500);
 
   // Initial startup
-  chrome.storage.local.get(DEFAULT_CONFIG, (stored) => {
-    currentConfig = { ...stored };
-    applyDynamicCssVars(stored);
-    filterDOM();
-  });
+  if (isExtContextValid()) {
+    chrome.storage.local.get(DEFAULT_CONFIG, (stored) => {
+      currentConfig = { ...stored };
+      applyDynamicCssVars(stored);
+      filterDOM();
+    });
+  }
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => filterDOM(), { once: true });

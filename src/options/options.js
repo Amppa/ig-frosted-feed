@@ -1,5 +1,13 @@
 // src/options/options.js
+
+// Guard: if the extension was reloaded while this page is open, chrome APIs
+// become unavailable. Bail out silently.
+function isExtContextValid() {
+  return typeof chrome !== 'undefined' && !!chrome.storage && !!chrome.runtime?.id;
+}
+
 document.addEventListener('DOMContentLoaded', () => {
+  if (!isExtContextValid()) return;
   // Defaults come from src/shared/defaults.js (loaded via options.html script tag).
   const DEFAULT_SETTINGS = { ...FROSTED_FEED_DEFAULTS };
 

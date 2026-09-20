@@ -1,5 +1,13 @@
 // src/popup/popup.js
+
+// Guard: if the extension was reloaded while this page is open, chrome APIs
+// become unavailable. Bail out silently.
+function isExtContextValid() {
+  return typeof chrome !== 'undefined' && !!chrome.storage && !!chrome.runtime?.id;
+}
+
 document.addEventListener('DOMContentLoaded', () => {
+  if (!isExtContextValid()) return;
   const enabledToggle = document.getElementById('enabled');
   const blockedCountEl = document.getElementById('blockedCount');
   const resetBtn = document.getElementById('resetBtn');
