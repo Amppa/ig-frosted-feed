@@ -11,7 +11,6 @@
     maskColor: '#000000',
     maskOpacity: 78,
     maskBlur: 4,
-    maskShiftY: 0,
     debugLog: false,
     blockedCount: 0,
   };
@@ -45,7 +44,6 @@
     const rgba = hexToRgba(config.maskColor, config.maskOpacity);
     root.style.setProperty('--frosted-mask-bg', rgba);
     root.style.setProperty('--frosted-mask-blur', `${config.maskBlur ?? 4}px`);
-    root.style.setProperty('--frosted-mask-shift-y', `${config.maskShiftY ?? 0}px`);
   }
 
   // --- 2. Batched Counter Storage ---
@@ -312,7 +310,6 @@
         'maskColor',
         'maskOpacity',
         'maskBlur',
-        'maskShiftY',
         'debugLog',
       ];
       const hasFunctionalChange = functionalKeys.some((k) => k in changes);

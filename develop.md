@@ -36,6 +36,6 @@ Abandoned: Dynamic Height Truncation / Collapsing:
   - `content.css`: Decoupled overlay and badge styling, natively injected by Chrome at `document_start`.
   - `content.js`: Pure detection, geometric alignment, and batched storage logic.
 - `src/options/`:
-  - `options.html / css / js`: Standalone dark-themed settings panel for real-time visual customizability (Mask Color, 0-100% Opacity, Blur, Vertical Offset, Coverage Mode).
+  - `options.html / css / js`: Standalone dark-themed settings panel for real-time visual customizability (Mask Color, 0-100% Opacity, Blur, Coverage Mode).
 - `src/popup/`:
   - `popup.html / css / js`: Clean master toggle and live masked items counter.

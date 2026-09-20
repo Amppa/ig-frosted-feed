@@ -18,7 +18,6 @@ A lightweight, high-performance Chrome Extension (Manifest V3) designed to elimi
 - **Dedicated Settings & Customization**:
   - **Mask Color & Opacity**: Adjust background tint and opacity from 0% (transparent glass) to 100% (solid dark).
   - **Backdrop Blur**: Real-time frosted glass effect (0px - 20px).
-  - **Alignment Offset**: Fine-tune vertical position with zero layout reflows.
   - **Diagnostic Logging**: Optional F12 Developer Console logs for troubleshooting.
 - **Minimalist Popup Interface**:
   - One-click master toggle switch.

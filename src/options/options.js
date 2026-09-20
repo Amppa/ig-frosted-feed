@@ -5,7 +5,6 @@ document.addEventListener('DOMContentLoaded', () => {
     maskColor: '#000000',
     maskOpacity: 78,
     maskBlur: 4,
-    maskShiftY: 0,
     debugLog: false,
   };
 
@@ -18,8 +17,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const maskOpacityVal = document.getElementById('maskOpacityVal');
   const maskBlurInput = document.getElementById('maskBlur');
   const maskBlurVal = document.getElementById('maskBlurVal');
-  const maskShiftYInput = document.getElementById('maskShiftY');
-  const maskShiftYVal = document.getElementById('maskShiftYVal');
   const debugLogInput = document.getElementById('debugLog');
   const resetBtn = document.getElementById('resetDefaultsBtn');
 
@@ -39,9 +36,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     maskBlurInput.value = settings.maskBlur;
     maskBlurVal.textContent = `${settings.maskBlur}px`;
-
-    maskShiftYInput.value = settings.maskShiftY;
-    maskShiftYVal.textContent = `${settings.maskShiftY}px`;
 
     debugLogInput.checked = settings.debugLog;
   }
@@ -82,12 +76,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const val = parseInt(e.target.value, 10);
     maskBlurVal.textContent = `${val}px`;
     saveChange('maskBlur', val);
-  });
-
-  maskShiftYInput.addEventListener('input', (e) => {
-    const val = parseInt(e.target.value, 10);
-    maskShiftYVal.textContent = `${val}px`;
-    saveChange('maskShiftY', val);
   });
 
   debugLogInput.addEventListener('change', (e) => {

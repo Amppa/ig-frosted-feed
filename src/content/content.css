@@ -4,7 +4,6 @@
 :root {
   --frosted-mask-bg: rgba(0, 0, 0, 0.78);
   --frosted-mask-blur: 4px;
-  --frosted-mask-shift-y: 0px;
 }
 
 /* Ensure container relativity for zero-shift overlay positioning */
@@ -18,7 +17,6 @@ article[data-frosted-feed-masked=true] {
   box-sizing: border-box !important;
   margin: 0 !important;
   padding: 0 !important;
-  transform: translateY(var(--frosted-mask-shift-y, 0px)) !important;
   z-index: 10 !important;
   background: var(--frosted-mask-bg, rgba(0, 0, 0, 0.78)) !important;
   backdrop-filter: blur(var(--frosted-mask-blur, 4px)) !important;
