@@ -46,7 +46,7 @@ frosted-feed/
 ├── manifest.json            # Manifest V3 configuration
 ├── README.md                # Project documentation
 ├── develop.md               # Architecture and technical design notes
-├── icons/                   # Extension icons (16, 48, 128)
+├── icons/                   # Extension icons (16, 32, 48, 128)
 └── src/
     ├── content/
     │   ├── content.css      # Overlay mask and interaction styling
