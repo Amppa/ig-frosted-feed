@@ -5,6 +5,11 @@
   --text-primary: #f0f0f2;
   --text-secondary: #909099;
   --divider: rgba(255, 255, 255, 0.08);
+  --btn-bg: rgba(255, 255, 255, 0.06);
+  --btn-bg-hover: rgba(255, 255, 255, 0.12);
+  --btn-border-hover: rgba(255, 255, 255, 0.22);
+  --track-off: #333338;
+  --knob: #ffffff;
   --accent-gradient: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
   --accent-soft: rgba(225, 48, 108, 0.15);
   --active-color: #e1306c;
@@ -156,7 +161,7 @@ body {
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: #333338;
+  background-color: var(--track-off);
   transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -167,12 +172,12 @@ body {
   width: 16px;
   left: 3px;
   bottom: 3px;
-  background-color: white;
+  background-color: var(--knob);
   transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 input:checked + .slider {
-  background: var(--accent-gradient);
+  background: #e1306c;
 }
 
 input:checked + .slider:before {
@@ -204,7 +209,7 @@ input:checked + .slider:before {
   padding: 10px 14px;
   border-radius: 8px;
   border: 1px solid var(--divider);
-  background: rgba(255, 255, 255, 0.06);
+  background: var(--btn-bg);
   color: var(--text-primary);
   font-size: 13px;
   font-weight: 600;
@@ -213,8 +218,8 @@ input:checked + .slider:before {
 }
 
 .settings-btn:hover {
-  background: rgba(255, 255, 255, 0.12);
-  border-color: rgba(255, 255, 255, 0.22);
+  background: var(--btn-bg-hover);
+  border-color: var(--btn-border-hover);
   transform: translateY(-1px);
 }
 

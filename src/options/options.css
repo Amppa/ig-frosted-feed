@@ -5,6 +5,10 @@
   --text-primary: #f0f0f2;
   --text-secondary: #909099;
   --divider: rgba(255, 255, 255, 0.08);
+  --btn-bg: rgba(255, 255, 255, 0.06);
+  --btn-bg-hover: rgba(255, 255, 255, 0.12);
+  --btn-border-hover: rgba(255, 255, 255, 0.22);
+  --knob: #ffffff;
   --accent-gradient: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
   --accent-color: #e1306c;
 }
@@ -88,8 +92,8 @@ body {
 
 .reset-btn:hover {
   color: #fff;
-  border-color: rgba(255, 255, 255, 0.3);
-  background: rgba(255, 255, 255, 0.06);
+  border-color: var(--btn-border-hover);
+  background: var(--btn-bg);
 }
 
 /* Settings Card */
@@ -255,7 +259,7 @@ input[type="color"]::-webkit-color-swatch {
   width: 18px;
   left: 3px;
   bottom: 3px;
-  background-color: white;
+  background-color: var(--knob);
   transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   border-radius: 50%;
 }
