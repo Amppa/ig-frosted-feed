@@ -55,13 +55,9 @@ body {
   width: 44px;
   height: 44px;
   border-radius: 12px;
-  background: var(--accent-gradient);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 800;
-  color: #fff;
-  font-size: 18px;
+  display: block;
+  object-fit: contain;
+  background: transparent;
   box-shadow: 0 4px 16px rgba(225, 48, 108, 0.4);
 }
 
