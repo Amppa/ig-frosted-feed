@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Frosted Feed for Instagram",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Muted Instagram suggested feeds and ads.",
   "icons": {
     "16": "icons/icon16.png",
