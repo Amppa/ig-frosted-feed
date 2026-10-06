@@ -45,12 +45,16 @@ A lightweight, high-performance Chrome Extension (Manifest V3) designed to elimi
 frosted-feed/
 ├── manifest.json            # Manifest V3 configuration
 ├── README.md                # Project documentation
-├── AGENTS.md                # Architecture notes & contributor/AI agent guide
+├── AGENTS.md                # AI engineering contract (workflow & rules)
+├── DEVELOPMENT.md           # Project guide (architecture & conventions)
 ├── icons/                   # Extension icons (16, 32, 48, 128)
+├── design/                  # Affinity Designer source for icon artwork
 └── src/
     ├── content/
     │   ├── content.css      # Overlay mask and interaction styling
     │   └── content.js       # Recommendation detection and boundary math
+    ├── shared/
+    │   └── defaults.js      # Default settings source of truth
     ├── options/
     │   ├── options.html     # Dedicated customization settings page
     │   ├── options.css      # Dark-themed responsive settings styling

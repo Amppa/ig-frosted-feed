@@ -1,106 +1,84 @@
-# Frosted Feed - Technical Architecture & AI Agent Guide (AGENTS.md)
+# AGENTS.md — AI Engineering Contract
+This file defines the engineering workflow and behavioral rules for AI coding agents.
 
-> Repository guidance for human contributors and AI coding agents (AGENTS.md convention).
-> Read this file first. Sections 1-3 describe the architecture and the constraints that are
-> easy to violate; section 4 lists the project's conventions, invariants, and release policy.
+## 1. Before Coding
+- Inspect the repository structure and relevant existing code before modifying it.
+- Read relevant project documentation and follow established architecture and conventions.
+- Check git status before making changes.
+- Never overwrite, discard, or reset pre-existing user changes.
+- Do not silently guess when requirements or architecture are materially ambiguous. Ask with concrete options.
 
-## 1. Vision & Architectural Philosophy
+## 2. Project Context
+- Project-specific architecture, conventions, verification, and decision records are documented in [DEVELOPMENT.md](DEVELOPMENT.md) and [README.md](README.md).
+- When present, these files are authoritative for the areas they cover.
+- `manifest.json` is authoritative for extension configuration; `src/shared/defaults.js` is authoritative for default settings.
 
-This project aims to provide an elegant, distraction-free browsing experience on Instagram Web with three core engineering principles:
+## 3. Keep Changes Surgical
+- Implement the smallest reasonable change that satisfies the requirement.
+- Reuse existing code, patterns, and abstractions.
+- Do not introduce speculative features, abstractions, or dependencies without explicit user approval.
+- Do not refactor, reformat, rename, or clean up unrelated code.
+- Preserve existing behavior outside the task scope.
 
-1. **Zero Layout Shift (Zero Stutter)**:
-   - Traditional content blockers either remove `<article>` nodes or force height to `0px`. In Instagram's React virtualized feed (StyleX), this triggers placeholder skeleton re-rendering and severe scroll jumping.
-   - **Solution**: We adopt a **Floating Zero-Shift Frosted Overlay Mask** (`position: absolute`). The original document flow remains 100% intact, preventing any layout thrashing or viewport hopping.
-2. **Precision Boundary Detection**:
-   - Instead of fragile DOM hierarchy traversing, the extension directly inspects post element bounding boxes (`getBoundingClientRect`) and synchronizes with `ResizeObserver`.
-   - The mask always bounds the photo/video box exactly, leaving the creator header and action buttons accessible. Masking is media-only by design; there is no user-facing coverage mode.
-   - `alignOverlay()` subtracts the article's `clientTop` / `clientLeft` from the media offsets, because `getBoundingClientRect()` returns the border box while absolutely-positioned children resolve against the padding box. Without this compensation the overlay drifts right/down by the article border width (visible on `/p/` permalink pages).
-3. **Pass-Through Native Interactions**:
-   - Revealing the masked post sets the overlay to `pointer-events: none`, allowing double-tap likes, carousel clicks, and video play/pause to function normally, while keeping a floating top-left pill button active for re-masking.
+## 4. Git Branch Workflow
+- `master` is the stable integration branch.
+- For non-trivial work, create a dedicated branch (`docs/<name>`, `feat/<name>`, `fix/<name>`, `refactor/<name>`).
+- Keep all development work isolated from `master`.
+- Trivial changes may remain on the current branch when a dedicated branch adds no meaningful benefit.
+- AI may create commits inside its working branch.
+- AI must NOT merge into `master` without explicit user approval; let the user choose timing and merge method (`--ff-only`, `--no-ff`, squash).
 
----
+## 5. Task Decomposition
+- For multi-step or multi-file tasks:
+  - Understand the complete task.
+  - Identify logical implementation units.
+  - Implement and verify them sequentially when practical.
+- Do not continue unrelated work on top of a known failing state.
+- Do not determine task or commit size by line count or file count.
 
-## 2. Key Evolution & Abandoned Approaches (Post-Mortem)
+## 6. Commit Granularity
+- A commit should be the smallest meaningful, coherent, independently understandable, and reasonably verifiable logical change.
+- Keep tightly coupled changes together (implementation + call-sites, setting default + its sync points).
+- Prefer separate commits for independent purposes (feature + refactor, bug fix + cleanup, code + assets + docs).
+- Commits are recovery checkpoints. AI may reorganize its own working-branch commits before merge.
+- This repo uses Conventional Commits, imperative English subject; see [DEVELOPMENT.md](DEVELOPMENT.md) § Commit Message Convention.
 
-Abandoned: GraphQL Network Response Interception:
-  *Attempted*: Modifying Instagram's internal fetch responses in the `MAIN` world to strip suggested items.
-  *Outcome*: Instagram's client-side React code verifies internal token signatures and edge pagination structures. Altering items caused client-side fatal errors and blank screen crashes.
-  *Decision*: Completely removed network tampering. Zero risk of breaking Instagram's React state.
+## 7. Verification
+- After each meaningful logical unit:
+  - Run the most relevant tests/checks.
+  - Inspect the diff.
+  - Confirm all changes are intentional.
+  - Commit when the unit forms a useful checkpoint.
+- A passing check is necessary but not sufficient. Also verify requirements and architectural fit.
+- This repo has no automated test suite; the manual checklist in [DEVELOPMENT.md](DEVELOPMENT.md) § Verification Checklist is the quality gate. Never claim untested behavior was verified.
+- If verification fails:
+  - Stop advancing to unrelated work.
+  - Diagnose the failure.
+  - Fix or revert the current change.
+  - Re-run verification before continuing.
 
-Abandoned: Dynamic Height Truncation / Collapsing:
-  *Attempted*: Shrinking suggested articles to 1px or hiding media divs.
-  *Outcome*: Triggered severe scroll bouncing and flickering skeletons.
-  *Decision*: Adopted absolute floating frosted overlays with CSS custom variables.
+## 8. Final Review
+- Before requesting merge:
+  - Run relevant tests and checks.
+  - Review the complete diff against `master`.
+  - Confirm no unrelated changes exist.
+  - Confirm no known failures remain.
+  - Confirm user changes were preserved.
+  - Keep documentation consistent with behavior; update it when workflow, configuration, user-visible behavior, or architecture changes.
+  - Report what changed, why, what was verified, and any remaining uncertainty, clearly separating observed facts from assumptions.
+- The user controls the final merge into `master` (squash-merging is preferred for multi-checkpoint branches).
 
----
+## 9. Safety & Compatibility
+- Never hard-code or commit secrets, API keys, tokens, or credentials.
+- Do not weaken input validation, permission checks, or output encoding.
+- Do not expose sensitive data in logs, tests, error messages, or commits.
+- Treat existing storage keys, public interfaces, and configuration formats as compatibility contracts: do not silently invalidate stored data or user settings, and state migration or rollback implications when they change.
 
-## 3. Component Breakdown
+## 10. Core Principle
+- **Branch** = isolation boundary
+- **Logical unit** = unit of work
+- **Commit** = recovery checkpoint
+- **Verification** = quality gate
+- **Merge** = human acceptance boundary
 
-- `src/content/`:
-  - `content.css`: Decoupled overlay and badge styling, natively injected by Chrome at `document_start`.
-  - `content.js`: Pure detection, geometric alignment, and batched storage logic.
-- `src/options/`:
-  - `options.html / css / js`: Standalone dark-themed settings panel for real-time visual customizability (Mask Color, 0-100% Opacity, Backdrop Blur, Console Log toggle).
-- `src/popup/`:
-  - `popup.html / css / js`: Clean master toggle and live masked items counter.
-
----
-
-## 4. Repository Conventions (Contributors & AI Agents)
-
-### 4.1 Build & Tooling
-
-- There is **no build step, bundler, package manager, or automated test suite**. Every file is shipped to Chrome exactly as it sits in the repo.
-- Do not introduce `package.json`, npm dependencies, ES module `import` / `export`, or any syntax that needs transpiling. Runtime files are classic scripts that share state through `globalThis`.
-- `src/shared/defaults.js` is the single source of truth for settings. It must stay listed in `manifest.json` **before** `src/content/content.js`, and must be loaded via a `<script>` tag before `options.js` / `popup.js`:
-
-```json
-"js": ["src/shared/defaults.js", "src/content/content.js"]
-```
-
-### 4.2 Invariants That Must Be Kept In Sync
-
-| Source of truth | Must stay in sync with | Why it matters |
-| --- | --- | --- |
-| `src/shared/defaults.js` (`maskOpacity`, `maskBlur`) | `--frosted-mask-bg` / `--frosted-mask-blur` in `src/content/content.css` | These CSS values prevent the first-paint flash; `content.css` is injected at `document_start`, before any JS runs, so it cannot read the JS defaults. |
-| `manifest.json` `icons` / `action.default_icon` keys | Actual PNG pixel size and exact path casing in `icons/` | A size or casing mismatch makes Chrome fall back to a blurry scaled icon. |
-| `README.md` project tree | The real repository layout | Renamed or added files (e.g. `AGENTS.md`, `design/`) must be reflected there. |
-
-### 4.3 Verification Checklist (before every commit)
-
-1. Parse the manifest: `Get-Content manifest.json -Raw | ConvertFrom-Json` (or any JSON linter). Nothing else validates it for you.
-2. Confirm every path referenced by `manifest.json` exists, and that each icon size key equals the actual PNG width and height (16/32/48/128).
-3. Load the folder in `chrome://extensions` -> **Load unpacked** (or **Reload** for an existing install), then exercise the popup, the options page, and a live `instagram.com` home feed with `debugLog` enabled.
-4. `git status --short` must be clean after committing: no stray untracked artifacts left behind.
-
-### 4.4 Versioning & Release Policy
-
-- `manifest.json` `version` is the only version source. Bump it in a dedicated `chore: bump version to vX.Y.Z` commit before packaging, because the Chrome Web Store rejects a re-upload whose version is unchanged.
-- Tag each release `vX.Y.Z` (existing tag: `v1.0.2`).
-- Packaged archives (`frosted-feed-vX.Y.Z.zip`) are **not tracked in version control**. Keep built packages out of the repository tree and ship them as release assets / store uploads instead.
-
-### 4.5 Commit Message Convention
-
-Conventional Commits, imperative English subject, with optional body bullets separated by blank lines:
-
-```
-<type>(<scope>): <subject>
-
-- <area>: <what changed and why>
-```
-
-- Types used in this repo: `feat`, `fix`, `style`, `refactor`, `docs`, `chore`.
-- Scopes used in this repo: `content`, `popup`, `options`, `icons`, `design`.
-- One logical change per commit; keep asset changes, code changes, and documentation changes in separate commits when they can be reviewed independently.
-
-### 4.6 Branding Assets
-
-- `icons/` ships `icon16/32/48/128.png`: a transparent rounded square with a pink-to-orange gradient and a white "FF" mark. All four sizes come from one artwork.
-- `design/ig-ff.af` is the tracked Affinity Designer source for that artwork. Regenerate the PNGs from it rather than hand-editing exported PNGs.
-- The popup / options `.logo-badge` recreates the same mark in CSS through `--accent-gradient`, so icon artwork and that CSS gradient should be revised together.
-
-### 4.7 Constraints That Must Not Be Broken
-
-- Never intercept or rewrite Instagram's network responses (see section 2): Instagram verifies internal tokens and fails to a blank screen.
-- Never remove `<article>` nodes or collapse their height. Masking must remain a floating `position: absolute` overlay so the feed's document flow and Instagram's virtualized scroll stay intact.
-- Masking applies to the Instagram home feed only. Explore, Reels, profile, and permalink routes must stay unmasked.
+Optimize for safe, understandable, recoverable changes, not minimum commits or minimum lines.
