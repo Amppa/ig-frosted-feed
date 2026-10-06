@@ -41,7 +41,7 @@ This file defines the engineering workflow and behavioral rules for AI coding ag
 - Keep tightly coupled changes together (implementation + call-sites, setting default + its sync points).
 - Prefer separate commits for independent purposes (feature + refactor, bug fix + cleanup, code + assets + docs).
 - Commits are recovery checkpoints. AI may reorganize its own working-branch commits before merge.
-- This repo uses Conventional Commits, imperative English subject; see [DEVELOPMENT.md](DEVELOPMENT.md) § Commit Message Convention.
+- This repo uses Conventional Commits, imperative English subject (see `git log --oneline` for the types and scopes in use).
 
 ## 7. Verification
 - After each meaningful logical unit:
@@ -50,7 +50,7 @@ This file defines the engineering workflow and behavioral rules for AI coding ag
   - Confirm all changes are intentional.
   - Commit when the unit forms a useful checkpoint.
 - A passing check is necessary but not sufficient. Also verify requirements and architectural fit.
-- This repo has no automated test suite; the manual checklist in [DEVELOPMENT.md](DEVELOPMENT.md) § Verification Checklist is the quality gate. Never claim untested behavior was verified.
+- This repo has no automated test suite; the quality gate is a JSON parse of `manifest.json` plus a **Load unpacked** run in `chrome://extensions` covering the popup, the options page, and a live home feed. Never claim untested behavior was verified.
 - If verification fails:
   - Stop advancing to unrelated work.
   - Diagnose the failure.
