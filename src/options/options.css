@@ -58,7 +58,6 @@ body {
   display: block;
   object-fit: contain;
   background: transparent;
-  box-shadow: 0 4px 16px rgba(225, 48, 108, 0.4);
 }
 
 .title {
