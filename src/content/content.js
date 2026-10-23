@@ -158,17 +158,38 @@
     }
   }
 
-  // Observe element resizing to synchronize overlay bounds
-  const picObserver = new ResizeObserver((entries) => {
-    for (const entry of entries) {
-      const el = entry.target;
-      const post = el.closest('article');
-      if (post) {
+  let resizeRafId = null;
+  const pendingResizePosts = new Set();
+
+  function flushResizeQueue() {
+    resizeRafId = null;
+    for (const post of pendingResizePosts) {
+      if (post.isConnected && post.dataset.frostedFeedMasked === 'true') {
         const overlay = post.querySelector('.frosted-feed-overlay');
         const pic = findPostPic(post);
         if (overlay) {
           alignOverlay(overlay, post, pic);
         }
+      }
+    }
+    pendingResizePosts.clear();
+  }
+
+  function schedulePostRealignment(post) {
+    if (!post) return;
+    pendingResizePosts.add(post);
+    if (!resizeRafId) {
+      resizeRafId = requestAnimationFrame(flushResizeQueue);
+    }
+  }
+
+  // Observe element resizing to synchronize overlay bounds
+  const picObserver = new ResizeObserver((entries) => {
+    for (const entry of entries) {
+      const el = entry.target;
+      const post = el.tagName === 'ARTICLE' ? el : el.closest('article');
+      if (post) {
+        schedulePostRealignment(post);
       }
     }
   });
@@ -236,7 +257,7 @@
       [120, 450, 1200].forEach((ms) => {
         setTimeout(() => {
           if (post.dataset.frostedFeedMasked === 'true' && post.isConnected) {
-            alignOverlay(overlay, post, findPostPic(post));
+            schedulePostRealignment(post);
           }
         }, ms);
       });
@@ -249,6 +270,12 @@
   // Remove mask from post
   function unmaskPost(post) {
     if (!post) return;
+    pendingResizePosts.delete(post);
+    picObserver.unobserve(post);
+    const header = post.querySelector('header');
+    if (header) picObserver.unobserve(header);
+    const pic = findPostPic(post);
+    if (pic) picObserver.unobserve(pic);
     delete post.dataset.frostedFeedMasked;
     const overlay = post.querySelector('.frosted-feed-overlay');
     if (overlay) overlay.remove();
@@ -361,15 +388,15 @@
   });
 
   // Window resize handler
-  window.addEventListener('resize', () => {
-    document.querySelectorAll('article[data-frosted-feed-masked="true"]').forEach((post) => {
-      const overlay = post.querySelector('.frosted-feed-overlay');
-      const pic = findPostPic(post);
-      if (overlay) {
-        alignOverlay(overlay, post, pic);
-      }
-    });
-  });
+  window.addEventListener(
+    'resize',
+    () => {
+      document.querySelectorAll('article[data-frosted-feed-masked="true"]').forEach((post) => {
+        schedulePostRealignment(post);
+      });
+    },
+    { passive: true }
+  );
 
   // SPA route-change detection: Instagram navigates without reloading, so poll the
   // URL and re-run the filter when leaving/entering the home feed. This strips
