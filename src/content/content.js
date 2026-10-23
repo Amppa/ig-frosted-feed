@@ -101,9 +101,9 @@
   function findPostPic(post) {
     const header = post.querySelector('header');
 
-    // 1. Check for video
+    // 1. Check for video (check videoWidth first to avoid triggering reflow via offsetHeight)
     const video = post.querySelector('video');
-    if (video && (video.offsetHeight > 100 || video.videoWidth > 0)) {
+    if (video && (video.videoWidth > 0 || video.offsetHeight > 100)) {
       return video;
     }
 
@@ -111,8 +111,8 @@
     const allImgs = Array.from(post.querySelectorAll('img'));
     const candidateImgs = allImgs.filter((img) => {
       if (header && header.contains(img)) return false;
-      const w = img.offsetWidth || img.naturalWidth || 0;
-      const h = img.offsetHeight || img.naturalHeight || 0;
+      const w = img.naturalWidth || img.offsetWidth || 0;
+      const h = img.naturalHeight || img.offsetHeight || 0;
       return !(w > 0 && w < 80 && h > 0 && h < 80);
     });
 
@@ -120,10 +120,10 @@
       return video || null;
     }
 
-    // Sort by rendered or natural visual area descending
+    // Sort by rendered or natural visual area descending (prefer natural dimensions)
     candidateImgs.sort((a, b) => {
-      const areaA = (a.offsetWidth || a.naturalWidth || 1) * (a.offsetHeight || a.naturalHeight || 1);
-      const areaB = (b.offsetWidth || b.naturalWidth || 1) * (b.offsetHeight || b.naturalHeight || 1);
+      const areaA = (a.naturalWidth || a.offsetWidth || 1) * (a.naturalHeight || a.offsetHeight || 1);
+      const areaB = (b.naturalWidth || b.offsetWidth || 1) * (b.naturalHeight || b.offsetHeight || 1);
       return areaB - areaA;
     });
 
@@ -148,13 +148,18 @@
       const topOffset = Math.max(0, picRect.top - postRect.top - post.clientTop);
       const leftOffset = Math.max(0, picRect.left - postRect.left - post.clientLeft);
 
-      overlay.style.top = `${topOffset}px`;
-      overlay.style.left = `${leftOffset}px`;
-      overlay.style.width = `${picRect.width}px`;
-      overlay.style.height = `${picRect.height}px`;
-      overlay.style.borderRadius = '4px';
+      const topStyle = `${topOffset}px`;
+      const leftStyle = `${leftOffset}px`;
+      const widthStyle = `${picRect.width}px`;
+      const heightStyle = `${picRect.height}px`;
+
+      if (overlay.style.top !== topStyle) overlay.style.top = topStyle;
+      if (overlay.style.left !== leftStyle) overlay.style.left = leftStyle;
+      if (overlay.style.width !== widthStyle) overlay.style.width = widthStyle;
+      if (overlay.style.height !== heightStyle) overlay.style.height = heightStyle;
+      if (overlay.style.borderRadius !== '4px') overlay.style.borderRadius = '4px';
     } else {
-      pic.addEventListener('load', () => alignOverlay(overlay, post, pic), { once: true });
+      pic.addEventListener('load', () => schedulePostRealignment(post), { once: true });
     }
   }
 
@@ -163,16 +168,47 @@
 
   function flushResizeQueue() {
     resizeRafId = null;
+    const updates = [];
+
+    // Phase 1: Batch read rects without triggering style invalidation
     for (const post of pendingResizePosts) {
       if (post.isConnected && post.dataset.frostedFeedMasked === 'true') {
         const overlay = post.querySelector('.frosted-feed-overlay');
         const pic = findPostPic(post);
-        if (overlay) {
-          alignOverlay(overlay, post, pic);
+        if (overlay && pic) {
+          const postRect = post.getBoundingClientRect();
+          const picRect = pic.getBoundingClientRect();
+          if (picRect.width > 0 && picRect.height > 0) {
+            const topOffset = Math.max(0, picRect.top - postRect.top - post.clientTop);
+            const leftOffset = Math.max(0, picRect.left - postRect.left - post.clientLeft);
+            updates.push({
+              overlay,
+              topOffset,
+              leftOffset,
+              width: picRect.width,
+              height: picRect.height,
+            });
+          } else {
+            pic.addEventListener('load', () => schedulePostRealignment(post), { once: true });
+          }
         }
       }
     }
     pendingResizePosts.clear();
+
+    // Phase 2: Batch write styles to prevent read-write layout thrashing
+    for (const u of updates) {
+      const topStyle = `${u.topOffset}px`;
+      const leftStyle = `${u.leftOffset}px`;
+      const widthStyle = `${u.width}px`;
+      const heightStyle = `${u.height}px`;
+
+      if (u.overlay.style.top !== topStyle) u.overlay.style.top = topStyle;
+      if (u.overlay.style.left !== leftStyle) u.overlay.style.left = leftStyle;
+      if (u.overlay.style.width !== widthStyle) u.overlay.style.width = widthStyle;
+      if (u.overlay.style.height !== heightStyle) u.overlay.style.height = heightStyle;
+      if (u.overlay.style.borderRadius !== '4px') u.overlay.style.borderRadius = '4px';
+    }
   }
 
   function schedulePostRealignment(post) {
