@@ -84,7 +84,7 @@
 
   function containsAnyPhrase(el, phrases) {
     if (!el) return false;
-    const text = (el.innerText || el.textContent || '').trim().toLowerCase();
+    const text = (el.textContent || '').trim().toLowerCase();
     return phrases.some((p) => text.includes(p));
   }
 
@@ -277,7 +277,7 @@
       } else {
         const buttons = header.querySelectorAll('button, [role="button"], span');
         for (const btn of buttons) {
-          const btnText = (btn.innerText || '').trim().toLowerCase();
+          const btnText = (btn.textContent || '').trim().toLowerCase();
           if (btnText === '追蹤' || btnText === '关注' || btnText === 'follow') {
             isSuggested = true;
             reason = 'Suggested Post (Follow CTA)';
