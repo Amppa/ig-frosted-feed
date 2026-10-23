@@ -328,12 +328,38 @@
   function filterDOM(root = document) {
     const isMaskActive = currentConfig.enabled && currentConfig.maskSuggested && isHomeFeed();
 
+    if (!isMaskActive) {
+      document.querySelectorAll('.frosted-feed-overlay').forEach((el) => el.remove());
+      document.querySelectorAll('article[data-frosted-feed-masked]').forEach((el) => unmaskPost(el));
+      document.querySelectorAll('article[data-frosted-feed-clean]').forEach((el) => {
+        delete el.dataset.frostedFeedClean;
+      });
+      return;
+    }
+
     const articles = root.querySelectorAll ? root.querySelectorAll('article') : [];
     articles.forEach((post) => {
+      // Skip if already masked with an active overlay
+      if (post.dataset.frostedFeedMasked === 'true' && post.querySelector('.frosted-feed-overlay')) {
+        return;
+      }
+
+      // Skip if already verified as a clean followed post
+      if (post.dataset.frostedFeedClean === 'true') {
+        return;
+      }
+
+      const header = post.querySelector('header') || post;
+      const headerText = (header.textContent || '').trim().toLowerCase();
+
+      // If header is not populated yet (e.g. skeleton state), wait for next mutation
+      if (!headerText) {
+        return;
+      }
+
       let isSuggested = false;
       let reason = '';
 
-      const header = post.querySelector('header') || post;
       if (containsAnyPhrase(header, SUGGESTED_PHRASES)) {
         isSuggested = true;
         reason = 'Suggested / Sponsored Post (Header Phrase)';
@@ -350,20 +376,13 @@
       }
 
       if (isSuggested) {
-        if (isMaskActive) {
-          maskSuggestedPost(post, reason);
-        } else {
-          unmaskPost(post);
-        }
+        delete post.dataset.frostedFeedClean;
+        maskSuggestedPost(post, reason);
       } else {
+        post.dataset.frostedFeedClean = 'true';
         unmaskPost(post);
       }
     });
-
-    if (!isMaskActive) {
-      document.querySelectorAll('.frosted-feed-overlay').forEach((el) => el.remove());
-      document.querySelectorAll('article[data-frosted-feed-masked]').forEach((el) => delete el.dataset.frostedFeedMasked);
-    }
   }
 
   // Storage change listener
@@ -384,6 +403,9 @@
           chrome.storage.local.get(DEFAULT_CONFIG, (updated) => {
             currentConfig = { ...updated };
             applyDynamicCssVars(updated);
+            document.querySelectorAll('article[data-frosted-feed-clean]').forEach((el) => {
+              delete el.dataset.frostedFeedClean;
+            });
             filterDOM();
           });
         }
@@ -442,6 +464,9 @@
     if (location.pathname !== lastPathname) {
       lastPathname = location.pathname;
       log(`🔀 Route changed to ${lastPathname} — re-evaluating masks`);
+      document.querySelectorAll('article[data-frosted-feed-clean]').forEach((el) => {
+        delete el.dataset.frostedFeedClean;
+      });
       filterDOM();
     }
   }, 500);
