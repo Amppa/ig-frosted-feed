@@ -1,4 +1,4 @@
-﻿/* src/content/content.css */
+/* src/content/content.css */
 /* Frosted Feed - Zero-Shift Overlay Mask & Interaction Styles */
 
 /* Keep these initial values in sync with src/shared/defaults.js —
@@ -27,6 +27,8 @@ article[data-frosted-feed-masked=true] {
   transition: opacity 0.25s ease, background-color 0.25s ease !important;
   user-select: none !important;
   overflow: hidden !important;
+  contain: paint layout !important;
+  transform: translateZ(0) !important;
 }
 
 /* Click-to-Reveal: transparent overlay allowing full native post clicks */
